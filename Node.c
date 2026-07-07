@@ -20,11 +20,12 @@ static char* SET_STACKTOOL_METHOD_NAME(getChar)(Node* node) {
     return node->data.c;
 }
 
-extern stack getStackTool() {
-    stack kit = {
+extern fstack getKitStack() {
+    fstack kit = {
         .push = SET_STACKTOOL_METHOD_NAME(push),
         .seek = SET_STACKTOOL_METHOD_NAME(seek),
         .getChar = SET_STACKTOOL_METHOD_NAME(getChar),
         .getInt = SET_STACKTOOL_METHOD_NAME(getInt),
-    }
+    };
+    return kit;
 }

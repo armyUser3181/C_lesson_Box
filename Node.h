@@ -2,16 +2,17 @@
 typedef struct Node {
     union {
         char c[56];
-        int i[23];
+        int i[14];
+        void* v[7];
     } data;
     struct Node* next;
 } Node;
 
-typedef struct stack {
+typedef struct fstack {
     Node* (*push)(Node*, Node*);
     Node* (*seek)(Node*);
     int* (*getInt)(Node*);
     char* (*getChar)(Node*);
-} stack;
+} fstack;
 
-extern stack getStackTool();
+extern fstack getKitStack();
