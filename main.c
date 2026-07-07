@@ -1,49 +1,62 @@
 #include <stdio.h>
 
-#define SEQ static _Thread_local unsigned long long int SEQ__POINT__LINE = __LINE__; switch( SEQ__POINT__LINE ) { case __LINE__:
-#define YED( value ) SEQ__POINT__LINE = __LINE__; return value; case __LINE__:
-#define END }
+#define YED return __LINE__; case __LINE__
 
 
-typedef int (*LoopFunction)(int argc, char** argv);
+
+struct Corut;
+typedef (*CorutFunction)(struct Corut*);
 
 typedef struct {
-    LoopFunction function;
-    int argc;
-    char **argv;
-    
-} LoopFunctionStruct;
+    size_t line;
+    size_t argc;
+    char** argv;
+    CorutFunction func;
+} Corut;
+
+typedef struct {
+    size_t corutc;
+    Corut* corutv;
+    size_t order;
+} Engine;
+
 
 
 
 int settingMemory() {
-
+    return ;
 }
 
 int start() {
-
+    return 0;
 }
 
 int run() {
-
+    return 0;
 }
 
-int seqTast() {
-    SEQ
-        printf("hello world 1 \n");
-        YED( 1 )
-        printf("hello world 2 \n");
-        YED( 2 )
-        printf("hello world 3 \n");
-        YED( 3 )
-        printf("hello world 4 \n");
-    END
-        return 4;
+int tast(Corut* cor) {
+    switch ( cor->line ) {
+        default:
+        printf("hello world\n");
+        printf("%s\n", cor->argv[0]);
+        YED:
+        printf("%s\n", cor->argv[1]);
+        YED:
+        printf("%s\n", cor->argv[2]);
+
+    }
 }
 
 int main(int argc, char** argv) {
-    for(int i = 0; i < 5; i++) {
-        seqTast();
+    char* args[] = {"hello world 1", "hello world 2", "hello world 3"};
+    Corut cor = {
+        .line = 0,
+        .argc = 3,
+        .argv = args,
+    };
+    for(int i = 0; i < 3; i++) {
+        cor.line = tast(&cor);
     }
     return 0;
 }
