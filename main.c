@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include 'Node.h'
+#include "Node.h"
 
 #define YED return __LINE__; case __LINE__
 
