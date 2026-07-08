@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11
 TARGET = main
-SRC = main.c
+SRC = ../Main/main.c ../Node/Node.c
 
 all: run $(TARGET)
 

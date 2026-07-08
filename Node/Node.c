@@ -1,11 +1,11 @@
 
-
+#include <stdio.h>
 #include "Node.h"
 
 #define SET_STACKTOOL_METHOD_NAME(name) __STACKTOOL__FUNCTION__##name
 
 static Node* SET_STACKTOOL_METHOD_NAME(push)(Node* node, Node* next) {
-    return node->next = next;
+    return next->next = node, next;
 }
 
 static Node* SET_STACKTOOL_METHOD_NAME(seek)(Node* node) {

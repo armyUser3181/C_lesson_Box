@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "Node.h"
+#include "../Node/Node.h"
 //#include "Corut.h"
 
 #define REY context.line = __LINE__; return; case __LINE__
@@ -21,20 +21,34 @@ static struct {
 
 
 void mainEngine() {
-    swtich( context.line ) {
+    switch( context.line ) {
         default:
         printf("1hello world\n");
+        context.flow = Flow_StackUp;
         REY:
         printf("2hello world\n");
+        context.flow = Flow_StackUp;
         REY:
         printf("3hello world\n");
-        REY:
+        context.stack.getInt(context.node)[0] = 100;
+        context.flow = Flow_StackUp;
+        REY: {
+            Node* next = context.node;
+            printf("next: %p seek: %p\n", next, context.stack.seek(next));
+            while(next = context.stack.seek(next)) {
+                int* i = context.stack.getInt(next);
+                char* c = context.stack.getChar(next);
+                printf("i: %d, c: %c\n", *i, *c);
+            }
+            printf("4hello world\n");
+        }
         context.flow = Flow_End;
-    };
+    }
 }
 
 void stackEngine() {
     Node node = {0};
+    printf("next: %p\n", &node);
     context.node = context.stack.push(context.node, &node);
     while(1) switch(context.flow) {
         case Flow_Main: mainEngine();
@@ -43,16 +57,18 @@ void stackEngine() {
         stackEngine();
         break;
         case Flow_StackDone: context.flow = Flow_Main;
+        context.node = context.stack.seek(context.node);
         return;
         break;
         case Flow_End:
         return;
-    };
+    }
 }
 
 int main(int argc, char** argv) {
     context.flow = Flow_Main;
     context.line = 0;
+    context.node = NULL;
     context.stack = getKitStack();
     stackEngine();
     return 0;
