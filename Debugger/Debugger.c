@@ -5,29 +5,28 @@
 #define SET_DEBUGGER_METHOD_NAME(name) __DEBUGGERTOOL__FUNCTION__##name
 
 static size_t debugMode = 0;
+static char* debugMemory = NULL;
+
+static void SET_DEBUGGER_METHOD_NAME(setMemory)(char* ptr) {
+    
+}
 
 static size_t SET_DEBUGGER_METHOD_NAME(log)(const char* format, ...) {
     if(debugMode == 0) return 0;
     char* corser = format;
     size_t line = 0;
     while(*corser) {
-        int hcode = *corser;
+        int hcode = *corser++;
 
         switch(line) {
             default:
 
-            switch(hcode) {
-                case '%':
-                break;
-                default:
-                
-                break;
-            }
+
+            if( hcode != '%' ) continue;
             line = __LINE__; break; case __LINE__:
 
 
         }
-        corser++;
     }
 }
 
