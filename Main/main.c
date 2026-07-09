@@ -35,7 +35,7 @@ void mainEngine() {
         REY: {
             Node* next = context.node;
             printf("next: %p seek: %p\n", next, context.stack.seek(next));
-            while(next = context.stack.seek(next)) {
+            while( (next = context.stack.seek(next)) ) {
                 int* i = context.stack.getInt(next);
                 char* c = context.stack.getChar(next);
                 printf("i: %d, c: %c\n", *i, *c);
@@ -65,7 +65,8 @@ void stackEngine() {
     }
 }
 
-int main(int argc, char** argv) {
+//int main(int argc, char** argv)
+int main(void) {
     context.flow = Flow_Main;
     context.line = 0;
     context.node = NULL;

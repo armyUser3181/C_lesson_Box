@@ -1,7 +1,7 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c11
+CFLAGS = -Wall -Wextra -std=c11 -Wno-implicit-fallthrough
 TARGET = main
-SRC = ../Main/main.c ../Node/Node.c
+SRC = ../Main/main.c ../Node/Node.c ../Debugger/Debugger.c
 
 all: run $(TARGET)
 
