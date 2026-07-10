@@ -41,7 +41,7 @@ static struct struct_put_struct get_put_struct(char* low, char* high) {
     return unit;
 }
 
-static int debug_context_memory_write(char* low, char* high, va_list list) {
+static int debug_context_memory_write(char* low, char* high) {
     struct struct_put_struct unit = get_put_struct(low, high);
     if( unit.fall ) {
         puts("error: out of memory in debugger ");
@@ -56,7 +56,7 @@ static int debug_context_memory_write_printf(char* low, char* high, ...) {
 
 }
 
-static void debug_printf_engine(char* ch) {
+static int debug_printf_engine(char* ch) {
     switch( debug_context.engine.line ) {
         default:
         if( strchr("-+0 #", *ch) == NULL ) {
@@ -88,16 +88,19 @@ static void debug_printf_engine(char* ch) {
         }
         if( strchr("diufeEgGcsoxXp", *ch) == NULL ) {
             if( *ch == '%' ) {
-
                 debug_context.engine.line = 0;
-                break;
+                return 2; // print %
             }
+        } else {
+
+            return 1; // print start
         }
 
         //debug_context.engine.line = __LINE__; break; case __LINE__:
         //debug_context.engine.line = __LINE__; break; case __LINE__:
         //debug_context.engine.line = __LINE__; break; case __LINE__:
     }
+    return 0; // no print
 }
 
 
@@ -127,7 +130,10 @@ static int SET_DEBUGGER_METHOD_NAME(log)(const char* format, ...) {
                 corser_low = hcode;
             }
             line = __LINE__; break; case __LINE__:
-            debug_printf_engine(hcode);
+            switch( debug_printf_engine(hcode) ) {
+                case 2:
+                
+            }
 
         }
     }
