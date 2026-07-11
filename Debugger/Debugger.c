@@ -6,8 +6,8 @@
 #define SET_DEBUGGER_METHOD_NAME(name) __DEBUGGERTOOL__FUNCTION__##name
 #define DEBUG_LOG(format, args...) printf("%d:" format, __LINE__, args )
 #define DEBUG_ERROR_LOG(format, args...) DEBUG_LOG(" ERROR :" format, args)
-#define DEBUG_PUT(string) DEBUG_LOG("%s", string)
-#define DEBUG_ERROR_PUT(string) DEBUG_ERROR_LOG("%s", string)
+#define DEBUG_PUT(string) DEBUG_LOG("%s\n", string)
+#define DEBUG_ERROR_PUT(string) DEBUG_ERROR_LOG("%s\n", string)
 #define MEMORY_DESIGN_SIZE(size) 128 * size
 
 static struct {
@@ -62,6 +62,8 @@ static struct {
 } debug_context = {
     .stream.ptr = NULL,
     .put.ptr = NULL,
+    .table.ptr = NULL,
+    .table.size = 0,
 };
 
 struct struct_put_struct {
@@ -76,6 +78,7 @@ struct struct_put_struct {
 static struct struct_put_struct get_put_struct(char* low, char* high) {
     struct struct_put_struct unit;
     unit.ptr = debug_context.stream.ptr + debug_context.stream.top;
+    unit.low = low;
     unit.max_size = debug_context.stream.size - debug_context.stream.top;
     unit.size = high - low;
     unit.fall = unit.max_size < unit.size;
@@ -88,7 +91,8 @@ static int debug_context_memory_write(char* low, char* high) {
         DEBUG_ERROR_PUT("error: out of memory in debugger ");
         return -1;
     }
-    memcpy(unit.low, unit.ptr, unit.size);
+    memcpy(unit.ptr, unit.low, unit.size);
+    //DEBUG_ERROR_PUT(unit.ptr);
     debug_context.stream.top += unit.size;
     return unit.size;
 }
@@ -102,7 +106,7 @@ static int debug_context_memory_write_printf(char* low, char* high, va_list list
         DEBUG_ERROR_PUT("error: out of memory in debugger ");
         return -1;
     }
-    memcpy(unit.low, space, unit.size);
+    memcpy(space, unit.low, unit.size);
     space[unit.size] = '\0';
     size_t input_size = vsnprintf(NULL, 0, space, list_cp);
     va_end(list_cp);
@@ -111,16 +115,18 @@ static int debug_context_memory_write_printf(char* low, char* high, va_list list
         return -1;
     }
     count = vsnprintf(unit.ptr, input_size + 1, space, list);
+    debug_context.stream.top += count;
     return count;
 }
 
 static int debug_printf_engine(char* ich) {
     unsigned char* ch = (unsigned char*)ich;
+    
     switch(debug_context.engine.line) {
-        default:
+        default: 
         if( debug_context.table.ptr[*ch] & debug_context.table.ptr['-'] ) { 
-            debug_context.engine.line = __LINE__; break; case __LINE__: 
-        } 
+            debug_context.engine.line = __LINE__; // break; case __LINE__: 
+        }
         if( debug_context.table.ptr[*ch] & debug_context.table.ptr['*'] ) {
             debug_context.engine.line = __LINE__; break; case __LINE__:
         } else {
@@ -199,7 +205,9 @@ static void SET_DEBUGGER_METHOD_NAME(setMemory)(char* ptr, size_t size) {
     debug_context.put.ptr = memory_design.point.put;
     debug_context.stream.size = memory_design.size.stream;
     debug_context.put.size = memory_design.size.put;
-    settingTable(memory_design.point.table, memory_design.size.table);
+    debug_context.table.ptr = memory_design.point.table;
+    debug_context.table.size = memory_design.size.table;
+    settingTable(debug_context.table.ptr, debug_context.table.size);
 }
 
 static int SET_DEBUGGER_METHOD_NAME(log)(const char* format, ...) {
@@ -222,14 +230,25 @@ static int SET_DEBUGGER_METHOD_NAME(log)(const char* format, ...) {
             }
             line = __LINE__; break; case __LINE__:
             switch( debug_printf_engine(hcode) ) {
-                case 2: { count += debug_context_memory_write(corser_low + 1, hcode); } break; case 1: {
+                case 2: { 
+                    count += debug_context_memory_write(corser_low + 1, hcode); 
+                    corser_low = corser_high;
+                    line = 0; 
+                } break; case 1: {
                     count += debug_context_memory_write_printf(corser_low, corser_high, list);
-                } break; case 0: continue;
+                    corser_low = corser_high;
+                    /* char ps[1024] = {0};
+                    memcpy(ps, corser_low, 1024);
+                    vprintf(ps, list); */
+                    line = 0;
+                } break; case 0: break;
             }
-
         }
     }
+    debug_context_memory_write(corser_low, corser_high);
     va_end(list);
+    printf("%s", debug_context.stream.ptr);
+    debug_context.stream.top = 0;
     return count;
 }
 

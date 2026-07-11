@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "../Node/Node.h"
+#include "../Debugger/Debugger.h"
 //#include "Corut.h"
 
 #define REY context.line = __LINE__; return; case __LINE__
@@ -18,29 +19,32 @@ static struct {
     Node* node;
 } context;
 
+static struct {
+    fdebugger clr;
+} bug;
+
 
 
 void mainEngine() {
     switch( context.line ) {
         default:
-        printf("1hello world\n");
+        //context.stack.getInt(context.node)[0] = 13;
         context.flow = Flow_StackUp;
         REY:
-        printf("2hello world\n");
+        context.stack.getInt(context.node)[0] = 13;
+        //printf("node.i: %d\n", context.stack.getInt(context.node)[0] );
         context.flow = Flow_StackUp;
-        REY:
-        printf("3hello world\n");
-        context.stack.getInt(context.node)[0] = 100;
-        context.flow = Flow_StackUp;
+        //bug.clr.log("node -> i: %d, \n   abcdeg\nabc  ", 32);
         REY: {
             Node* next = context.node;
-            printf("next: %p seek: %p\n", next, context.stack.seek(next));
-            while( (next = context.stack.seek(next)) ) {
+            //printf("next: %p seek: %p\n", next, context.stack.seek(next));
+            if(next) do {
                 int* i = context.stack.getInt(next);
                 char* c = context.stack.getChar(next);
-                printf("i: %d, c: %c\n", *i, *c);
-            }
-            printf("4hello world\n");
+                bug.clr.log("node -> i: %d, %c \nab", *i, *c);
+                //printf("i: %d, c: %c\n", *i, *c);
+            } while( (next = context.stack.seek(next)) );
+            //printf("4hello world\n");
         }
         context.flow = Flow_End;
     }
@@ -48,7 +52,7 @@ void mainEngine() {
 
 void stackEngine() {
     Node node = {0};
-    printf("next: %p\n", &node);
+    //printf("next: %p\n", &node);
     context.node = context.stack.push(context.node, &node);
     while(1) switch(context.flow) {
         case Flow_Main: mainEngine();
@@ -71,6 +75,10 @@ int main(void) {
     context.line = 0;
     context.node = NULL;
     context.stack = getKitStack();
+    char debug_space[4096] = {0};
+    bug.clr = getKitDebugger();
+    bug.clr.setMemory((char*)debug_space, 4096);
+    bug.clr.start();
     stackEngine();
     return 0;
 }
