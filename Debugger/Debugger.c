@@ -64,7 +64,7 @@ static struct {
     .put.ptr = NULL,
 };
 
-static struct struct_put_struct {
+struct struct_put_struct {
     char* ptr;
     char* low;
     size_t max_size;
@@ -114,7 +114,8 @@ static int debug_context_memory_write_printf(char* low, char* high, va_list list
     return count;
 }
 
-static int debug_printf_engine(char* ch) {
+static int debug_printf_engine(char* ich) {
+    unsigned char* ch = (unsigned char*)ich;
     switch(debug_context.engine.line) {
         default:
         if( debug_context.table.ptr[*ch] & debug_context.table.ptr['-'] ) { 
@@ -154,34 +155,35 @@ static int debug_printf_engine(char* ch) {
 }
 
 static void settingTable(char* ptr, size_t size) {
-    char* curser = NULL;
+    const char* curser = NULL;
+    if(256 > size) return;
     curser = "-+0# ";
     while(*curser) {
-        ptr[*curser++] |= 1; // 첫번째 분기
+        ptr[(unsigned char)*curser++] |= 1; // 첫번째 분기
     }
     curser = "0123456789";
     while(*curser) {
-        ptr[*curser++] |= 2; // 숫자 분기
+        ptr[(unsigned char)*curser++] |= 2; // 숫자 분기
     }
     curser = "*";
     while(*curser) {
-        ptr[*curser++] |= 4; // * 분기
+        ptr[(unsigned char)*curser++] |= 4; // * 분기
     }
     curser = ".";
     while(*curser) {
-        ptr[*curser++] |= 8; // . 분기
+        ptr[(unsigned char)*curser++] |= 8; // . 분기
     }
     curser = "hz";
     while(*curser) {
-        ptr[*curser++] |= 16; // 크기 분기
+        ptr[(unsigned char)*curser++] |= 16; // 크기 분기
     }
     curser = "l";
     while(*curser) {
-        ptr[*curser++] |= 32; // 크기 분기 2
+        ptr[(unsigned char)*curser++] |= 32; // 크기 분기 2
     }
     curser = "diufeEgGcsoxXp";
     while(*curser) {
-        ptr[*curser++] |= 64; // 타입 분기
+        ptr[(unsigned char)*curser++] |= 64; // 타입 분기
     }
 }
 
