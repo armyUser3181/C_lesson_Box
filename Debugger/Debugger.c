@@ -95,11 +95,12 @@ static int debug_printf_engine(char* ch) {
 
         } else {
             debug_context.engine.line = __LINE__; break; } case __LINE__:
-        if( strchr("-+0 #", *ch) == NULL ) {
+       if( '0' <= *ch && *ch <= '9' ) {
 
+            break;
         } else { 
-            debug_context.engine.line = __LINE__; break; } case __LINE__:
-        if( *ch == 'h' ) {
+            debug_context.engine.line = __LINE__; /*  */ } case __LINE__:
+        if( *ch == 'h' || *ch == 'z' ) {
             debug_context.engine.line = __LINE__; break; case __LINE__:
         } else
         if( *ch == 'l' ) {
