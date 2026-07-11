@@ -1,0 +1,8 @@
+count += %1[-+0# ]
+count += %[0123456789] || count += %1[*]
+count += %1[.] && count += %[0123456789] || count += %1[*]
+count += %1[hlz]
+count += %1[l]
+count += %1[diufeEgGcsoxXp]
+
+diufeEgGcsoxXp*-+0# hlz
