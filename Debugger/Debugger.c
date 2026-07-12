@@ -284,7 +284,9 @@ static void SET_DEBUGGER_METHOD_NAME(end)() {
 fdebugger getKitDebugger() {
     fdebugger kit = {
         .log = SET_DEBUGGER_METHOD_NAME(log),
+        .logln = SET_DEBUGGER_METHOD_NAME(logln),
         .start = SET_DEBUGGER_METHOD_NAME(start),
+        .stop = SET_DEBUGGER_METHOD_NAME(stop),
         .end = SET_DEBUGGER_METHOD_NAME(end),
         .setMemory = SET_DEBUGGER_METHOD_NAME(setMemory),
     };
