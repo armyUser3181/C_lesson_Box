@@ -108,13 +108,13 @@ static int debug_context_memory_write_printf(char* low, char* high, va_list list
     }
     memcpy(space, unit.low, unit.size);
     space[unit.size] = '\0';
-    size_t input_size = vsnprintf(NULL, 0, space, list_cp);
+    size_t input_size = vsnprintf(NULL, 0, space, list_cp) + 1;
     va_end(list_cp);
     if( unit.max_size < input_size + 1 ) {
         DEBUG_ERROR_PUT("error: out of memory in debugger ");
         return -1;
     }
-    count = vsnprintf(unit.ptr, input_size + 1, space, list);
+    count = vsnprintf(unit.ptr, input_size, space, list);
     debug_context.stream.top += count;
     return count;
 }
@@ -210,14 +210,12 @@ static void SET_DEBUGGER_METHOD_NAME(setMemory)(char* ptr, size_t size) {
     settingTable(debug_context.table.ptr, debug_context.table.size);
 }
 
-static int SET_DEBUGGER_METHOD_NAME(log)(const char* format, ...) {
+static int log_function(const char* format, va_list list) {
     if(debug_context.debugMode == 0) return 0;
     int count = 0;
     char* corser_low = (char*)format;
     char* corser_high = (char*)format;
     size_t line = 0;
-    va_list list;
-    va_start(list, format);
     while(*corser_high) {
         char* hcode = corser_high++;
 
@@ -246,14 +244,37 @@ static int SET_DEBUGGER_METHOD_NAME(log)(const char* format, ...) {
         }
     }
     debug_context_memory_write(corser_low, corser_high);
-    va_end(list);
+    debug_context.stream.ptr[debug_context.stream.top] = '\0';
+    
+    return count;
+}
+
+static int SET_DEBUGGER_METHOD_NAME(log)(const char* format, ...) {
+    va_list list;
+    va_start(list, format);
+    int result = log_function(format, list);
     printf("%s", debug_context.stream.ptr);
     debug_context.stream.top = 0;
-    return count;
+    va_end(list);
+    return result;
+}
+
+static int SET_DEBUGGER_METHOD_NAME(logln)(const char* format, ...) {
+    va_list list;
+    va_start(list, format);
+    int result = log_function(format, list);
+    printf("%s\n", debug_context.stream.ptr);
+    debug_context.stream.top = 0;
+    va_end(list);
+    return result;
 }
 
 static void SET_DEBUGGER_METHOD_NAME(start)() {
     debug_context.debugMode = 1;
+}
+
+static void SET_DEBUGGER_METHOD_NAME(stop)() {
+    debug_context.debugMode = 0;
 }
 
 static void SET_DEBUGGER_METHOD_NAME(end)() {

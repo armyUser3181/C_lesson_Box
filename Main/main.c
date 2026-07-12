@@ -41,7 +41,7 @@ void mainEngine() {
             if(next) do {
                 int* i = context.stack.getInt(next);
                 char* c = context.stack.getChar(next);
-                bug.clr.log("node -> i: %d, %c \nab", *i, *c);
+                bug.clr.log("<node -> i: %d, %d>", *i, *i);
                 //printf("i: %d, c: %c\n", *i, *c);
             } while( (next = context.stack.seek(next)) );
             //printf("4hello world\n");
