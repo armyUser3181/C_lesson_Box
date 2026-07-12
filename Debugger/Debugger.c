@@ -119,7 +119,7 @@ static int debug_context_memory_write_printf(char* low, char* high, va_list list
     return count;
 }
 
-static int debug_printf_engine(char* ich) {
+static int debug_printf_engine(char* ich) { // priss
     unsigned char* ch = (unsigned char*)ich;
     
     switch(debug_context.engine.line) {
